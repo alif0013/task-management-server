@@ -43,14 +43,14 @@ async function run() {
         })
 
 
-    
+
         // task related api 
         app.get('/task', async (req, res) => {
             const result = await taskCollection.find().toArray();
             res.send(result)
         })
-        
-        app.get('/manage-task', async (req, res) => {
+
+        app.get('/to-do', async (req, res) => {
             const email = req.query.email;
             const query = { email: email };
             const result = await taskCollection.find(query).toArray();
@@ -63,9 +63,45 @@ async function run() {
             res.send(result)
         })
 
-       
+        // updated a task 
+
+        app.put("/update-task/:id", async (req, res) => {
+            const id = req.params.id;
+            const updateTask = req.body;
+            // console.log("id", id, updatedProduct);
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            // title, description,email, marks, due, level, photo
+
+            const product = {
+                $set: {
+
+                    title: updateTask.title,
+                    description: updateTask.description,
+                    tags: updateTask.tags,
+                    deadline: updateTask.deadline,
+                    
+                },
+            };
+            const result = await taskCollection.updateOne(
+                filter,
+                product,
+                options
+            );
+            res.send(result);
+        });
 
 
+
+
+        // delete a task by delete operation
+        app.delete('/task/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            // const query = {_id: id}
+            const result = await taskCollection.deleteOne(query)
+            res.send(result)
+        })
 
 
 
